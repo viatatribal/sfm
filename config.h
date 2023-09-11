@@ -53,9 +53,10 @@ static const char *nsxiv[]        = { "nsxiv" };
 static const char *zathura[]      = { "zathura" };
 static const char *libreoffice[]  = { "libreoffice" };
 static const char *r2[]           = { "r2", "-c", "vv" };
+static const char *imv[]          = { "imv-x11" };
 
 /* extensions*/
-static const char *images[]    = { "bmp", "jpg", "jpeg", "png", "gif", "webp", "xpm" };
+static const char *images[]    = { "bmp", "jpg", "jpeg", "png", "xpm" };
 static const char *pdf[]       = { "epub", "pdf", "djvu" };
 static const char *obj[]       = { "o", "a", "so" };
 static const char *videos[]    = { "avi", "flv", "wav", "webm", "wma", "wmv",
@@ -63,6 +64,7 @@ static const char *videos[]    = { "avi", "flv", "wav", "webm", "wma", "wmv",
 				   "mp4", "mpeg", "mpg" };
 static const char *documents[] = { "odt", "doc", "docx", "xls", "xlsx", "odp",
 				   "ods", "pptx", "odg" };
+static const char *gif[]       = { "gif" };
 
 static Rule rules[] = {
 	{videos,    LEN(videos),    mpv,         LEN(mpv)         },
@@ -70,6 +72,7 @@ static Rule rules[] = {
 	{pdf,       LEN(pdf),       zathura,     LEN(zathura)     },
 	{documents, LEN(documents), libreoffice, LEN(libreoffice) },
 	{obj,       LEN(obj),       r2,          LEN(r2)          },
+    {gif,       LEN(gif),       imv,         LEN(imv)         },
 };
 
 /* normal keys */
