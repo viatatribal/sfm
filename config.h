@@ -53,7 +53,6 @@ static const char *nsxiv[]        = { "nsxiv" };
 static const char *zathura[]      = { "zathura" };
 static const char *libreoffice[]  = { "libreoffice" };
 static const char *r2[]           = { "r2", "-c", "vv" };
-static const char *nsxivgif[]     = { "nsxiv", "-a" };
 
 /* extensions*/
 static const char *images[]    = { "bmp", "jpg", "jpeg", "gif", "png", "xpm" };
