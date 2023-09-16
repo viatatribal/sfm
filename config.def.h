@@ -49,15 +49,14 @@ static const char root[]   = "/";
 
 /* software */
 static const char *mpv[]          = { "mpv", "--fullscreen" };
-static const char *sxiv[]         = { "sxiv" };
-static const char *mupdf[]        = { "mupdf", "-I" };
+static const char *nsxiv[]         = { "nsxiv" };
+static const char *zathura[]        = { "zathura" };
 static const char *libreoffice[]  = { "libreoffice" };
-static const char *gimp[]         = { "gimp" };
 static const char *r2[]           = { "r2", "-c", "vv" };
-
+static const char *tar[]          = { "tar", "-xzvf"};
 /* extensions*/
 static const char *images[]    = { "bmp", "jpg", "jpeg", "png", "gif", "webp", "xpm" };
-static const char *pdf[]       = { "epub", "pdf" };
+static const char *pdf[]       = { "epub", "pdf", "djvu"};
 static const char *arts[]      = { "xcf" };
 static const char *obj[]       = { "o", "a", "so" };
 static const char *videos[]    = { "avi", "flv", "wav", "webm", "wma", "wmv",
@@ -65,14 +64,14 @@ static const char *videos[]    = { "avi", "flv", "wav", "webm", "wma", "wmv",
 				   "mp4", "mpeg", "mpg" };
 static const char *documents[] = { "odt", "doc", "docx", "xls", "xlsx", "odp",
 				   "ods", "pptx", "odg" };
-
+static const char *tarf[]      = { "gz", "tar" };
 static Rule rules[] = {
 	{videos,    LEN(videos),    mpv,         LEN(mpv)         },
-	{images,    LEN(images),    sxiv,        LEN(sxiv)        },
-	{pdf,       LEN(pdf),       mupdf,       LEN(mupdf)       },
+	{images,    LEN(images),    nsxiv,       LEN(nsxiv)       },
+	{pdf,       LEN(pdf),	    zathura,     LEN(zathura)     },
 	{documents, LEN(documents), libreoffice, LEN(libreoffice) },
-	{arts,      LEN(arts),      gimp,        LEN(gimp)        },
 	{obj,       LEN(obj),       r2,          LEN(r2)          },
+	{tarf,      LEN(tarf),      tar,         LEN(tar)         },
 };
 
 /* normal keys */
