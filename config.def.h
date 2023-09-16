@@ -57,7 +57,6 @@ static const char *tar[]          = { "tar", "-xzvf"};
 /* extensions*/
 static const char *images[]    = { "bmp", "jpg", "jpeg", "png", "gif", "webp", "xpm" };
 static const char *pdf[]       = { "epub", "pdf", "djvu"};
-static const char *arts[]      = { "xcf" };
 static const char *obj[]       = { "o", "a", "so" };
 static const char *videos[]    = { "avi", "flv", "wav", "webm", "wma", "wmv",
 				   "m2v", "m4a", "m4v", "mkv", "mov", "mp3",
