@@ -115,6 +115,7 @@ static void print_error(char *);
 static void print_prompt(char *);
 static void print_info(Pane *, char *);
 static void print_row(Pane *, size_t, Cpair);
+static char *get_icon(Pane *, size_t, Cpair, mode_t);
 static void clear(int, int, int, uint16_t);
 static void clear_status(void);
 static void clear_pane(Pane *);
@@ -340,7 +341,88 @@ print_row(Pane *pane, size_t entpos, Cpair col)
 		free(rez_pth);
 	}
 
-	printf_tb(x, y, col, "%*.*s", ~hwidth, hwidth, full_str);
+	char *icon = get_icon(pane, entpos, col, pane->direntr[entpos].mode);
+
+	if(strcmp(icon, "") == 0)
+		printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth, hwidth, full_str);
+	else
+		printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth+2, hwidth, full_str);
+}
+
+static char *
+get_icon(Pane *pane, size_t entpos, Cpair col, mode_t mode)
+{
+	char *ex, *icon;
+	char *full_str;
+	full_str = basename(pane->direntr[entpos].name);
+	ex = get_ext(full_str);
+
+	switch (mode & S_IFMT) {
+	case S_IFDIR: /* folders */
+		if(strcmp(ex, "ownl") == 0) /* downloads */
+			icon = "󰉍 ";
+		else if(strcmp(ex, "odes") == 0) /* codes */
+			icon = " ";
+		else if(strcmp(ex, "git") == 0) /* git folder */
+			icon = " ";
+		else
+			icon = " "; /* default folder */
+			/* Uncomment to get the folders "extensions"
+			 * then change above (comment again after) */
+			//icon = ex; /* debug */
+		break;
+	case S_IFLNK: /* links */
+		icon = " ";
+		break;
+	case S_IFREG:
+	case S_IFBLK:
+	case S_IFCHR:
+	case S_IFIFO:
+	case S_IFSOCK: /* files */
+		if(strcmp(ex, "zip") == 0 || strcmp(ex, "rar") == 0 ||
+		   strcmp(ex, "tar") == 0 || strcmp(ex, "gz") == 0  ||
+		   strcmp(ex, "7z") == 0  || strcmp(ex, "gzip") == 0)
+			/* compressed file formats */
+			icon = " ";
+		else if(strcmp(ex, "gb")  == 0 || strcmp(ex, "gba") == 0 ||
+			strcmp(ex, "gbc") == 0 || strcmp(ex, "fds") == 0 ||
+			strcmp(ex, "nes") == 0 || strcmp(ex, "iso") == 0 ||
+			strcmp(ex, "sfc") == 0 || strcmp(ex, "gen") == 0 ||
+			strcmp(ex, "gg")  == 0 || strcmp(ex, "n64") == 0 ||
+			strcmp(ex, "nds") == 0 || strcmp(ex, "pce") == 0 ||
+			strcmp(ex, "ws")  == 0 || strcmp(ex, "bin") == 0 ||
+			strcmp(ex, "cue") == 0 || strcmp(ex, "iso") == 0)
+			/* video game file formats */
+			icon = " ";
+		else if(strcmp(ex, "mp3") == 0  || strcmp(ex, "wav") == 0 ||
+			strcmp(ex, "flac") == 0 || strcmp(ex, "m4a") == 0 ||
+			strcmp(ex, "opus") == 0 || strcmp(ex, "ogg") == 0)
+			/* music file fomarts */
+			icon = " ";
+		else if(strcmp(ex, "pdf") == 0 || strcmp(ex, "djvu") == 0 ||
+			strcmp(ex, "epub") == 0)
+			/* book file formats */
+			icon = " ";
+		else if(strcmp(ex, "png") == 0 || strcmp(ex, "webp") == 0 ||
+			strcmp(ex, "ico") == 0 || strcmp(ex, "jpg")  == 0 ||
+			strcmp(ex, "jpe") == 0 || strcmp(ex, "jpeg") == 0 ||
+			strcmp(ex, "gif") == 0 || strcmp(ex, "bmp")  == 0 ||
+			strcmp(ex, "ppm") == 0 || strcmp(ex, "webm") == 0)
+			/* graphics file formats */
+			icon = " ";
+		else if(strcmp(ex, "mp4") == 0  || strcmp(ex, "mkv") == 0)
+			/* video file formats */
+			icon = "󰻏 ";
+		else
+			icon = " ";
+		break;
+	default:
+		icon = "";
+		//icon = ex; /* debug */
+		break;
+	}
+
+	return icon;
 }
 
 static void
