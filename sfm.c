@@ -169,6 +169,8 @@ static void seldel(const Arg *arg);
 static void init_files(void);
 static void free_files(void);
 static void yank(const Arg *arg);
+static void dragon(const Arg *arg);
+static void seldragon(const Arg *arg);
 static void rname(const Arg *arg);
 static void chngo(const Arg *arg);
 static void chngm(const Arg *arg);
@@ -1609,6 +1611,44 @@ yank(const Arg *arg)
 	sel_files[0] = ecalloc(MAX_P, sizeof(char));
 	strncpy(sel_files[0], CURSOR(cpane).name, MAX_P);
 	print_status(cprompt, "1 file is yanked", sel_len);
+}
+
+static void
+dragon(const Arg *arg)
+{
+	if (cpane->dirc <1)
+		return;
+
+	char cmd [500];
+	free_files();
+	sel_len = 1;
+	sel_files = ecalloc(sel_len, sizeof(char *));
+	sel_files[0] = ecalloc(MAX_P, sizeof(char));
+	strncpy(sel_files[0], CURSOR(cpane).name, MAX_P);
+	strcpy(cmd, "dragon-drop -i -x \"");
+	strcat(cmd, sel_files[0]);
+	strcat(cmd, "\"");
+	system(cmd);
+	print_status(cprompt, "1 file dropped", sel_len);
+}
+
+static void
+seldragon(const Arg *arg)
+{
+	init_files();
+	refresh_pane(cpane);
+	add_hi(cpane, cpane->hdir - 1);
+	char cmd [500];
+	strcpy(cmd, "dragon-drop -i -a");
+	int n = sel_len;
+	for (int i = 0; i < n; i++){
+		strcat(cmd, "\" ");
+		strcat(cmd, sel_files[i]);
+		strcat(cmd, "\" ");
+	}
+	system(cmd);
+	print_status(cprompt, "%zu files dropped", sel_len);
+	cont_vmode = -1;
 }
 
 static void

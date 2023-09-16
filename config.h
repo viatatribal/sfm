@@ -49,26 +49,26 @@ static const char root[]   = "/";
 
 /* software */
 static const char *mpv[]          = { "mpv", "--fullscreen" };
-static const char *nsxiv[]        = { "nsxiv" };
-static const char *zathura[]      = { "zathura" };
+static const char *nsxiv[]         = { "nsxiv" };
+static const char *zathura[]        = { "zathura" };
 static const char *libreoffice[]  = { "libreoffice" };
 static const char *r2[]           = { "r2", "-c", "vv" };
 static const char *tar[]          = { "tar", "-xzvf"};
 /* extensions*/
-static const char *images[]    = { "bmp", "jpg", "jpeg", "gif", "png", "xpm" };
-static const char *pdf[]       = { "epub", "pdf", "djvu" };
+static const char *images[]    = { "bmp", "jpg", "jpeg", "png", "gif", "webp", "xpm" };
+static const char *pdf[]       = { "epub", "pdf", "djvu"};
+static const char *arts[]      = { "xcf" };
 static const char *obj[]       = { "o", "a", "so" };
 static const char *videos[]    = { "avi", "flv", "wav", "webm", "wma", "wmv",
 				   "m2v", "m4a", "m4v", "mkv", "mov", "mp3",
 				   "mp4", "mpeg", "mpg" };
 static const char *documents[] = { "odt", "doc", "docx", "xls", "xlsx", "odp",
 				   "ods", "pptx", "odg" };
-static const char *tarf[] = { "gz", "tar" };
-
+static const char *tarf[]      = { "gz", "tar" };
 static Rule rules[] = {
 	{videos,    LEN(videos),    mpv,         LEN(mpv)         },
 	{images,    LEN(images),    nsxiv,       LEN(nsxiv)       },
-	{pdf,       LEN(pdf),       zathura,     LEN(zathura)     },
+	{pdf,       LEN(pdf),	    zathura,     LEN(zathura)     },
 	{documents, LEN(documents), libreoffice, LEN(libreoffice) },
 	{obj,       LEN(obj),       r2,          LEN(r2)          },
 	{tarf,      LEN(tarf),      tar,         LEN(tar)         },
@@ -89,6 +89,7 @@ static Key nkeys[] = {
 	{ {.key = TB_KEY_ARROW_LEFT},  mvbk,         {.i = 0}        },
 	{ {.ch = 'g'},                 mvtop,        {.i = 0}        },
 	{ {.ch = 'G'},                 mvbtm,        {.i = 0}        },
+	{ {.ch = 'o'},                 dragon,       {0}             },
 	{ {.ch = 'n'},                 crnf,         {0}             },
 	{ {.ch = 'N'},                 crnd,         {0}             },
 	{ {.ch = 'd'},                 delent,       {0}             },
@@ -130,6 +131,7 @@ static Key vkeys[] = {
 	{ {.ch = 'a'},                 selall,          {0}            },
 	{ {.ch = 'y'},                 selynk,          {0}            },
 	{ {.ch = 'd'},                 seldel,          {.v = delconf} },
+	{ {.ch = 'o'},                 seldragon,       {0}            },
 	{ {.ch = 'q'},                 exit_vmode,      {0}            },
 	{ {.ch = 'v'},                 exit_vmode,      {0}            },
 	{ {.key = TB_KEY_ESC},         exit_vmode,      {0}            },
