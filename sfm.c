@@ -311,8 +311,8 @@ print_info(Pane *pane, char *dirsize)
 		}
 	}
 
-	print_status(cstatus, "%02d/%02d %s %s:%s %s %s", pane->hdir,
-		pane->dirc, prm, ur, gr, dt, sz);
+	print_status(cstatus, "%02d/%02d %s %s:%s %s %s %s", pane->hdir,
+		pane->dirc, prm, ur, gr, basename(CURSOR(pane).name), dt, sz);
 
 	free(prm);
 	free(ur);
