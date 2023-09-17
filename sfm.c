@@ -422,7 +422,7 @@ get_icon(Pane *pane, size_t entpos, Cpair col, mode_t mode)
 		//icon = ex; /* debug */
 		break;
 	}
-
+	free(ex);
 	return icon;
 }
 
@@ -1727,6 +1727,8 @@ dragon(const Arg *arg)
 	strcat(cmd, "\"");
 	system(cmd);
 	print_status(cprompt, "1 file dropped", sel_len);
+	free(sel_files[0]);
+	free(sel_files);
 }
 
 static void
@@ -1736,10 +1738,10 @@ seldragon(const Arg *arg)
 	refresh_pane(cpane);
 	add_hi(cpane, cpane->hdir - 1);
 	char cmd [500];
-	strcpy(cmd, "dragon-drop -i -a");
+	strcpy(cmd, "dragon-drop -i -a ");
 	int n = sel_len;
 	for (int i = 0; i < n; i++){
-		strcat(cmd, "\" ");
+		strcat(cmd, "\"");
 		strcat(cmd, sel_files[i]);
 		strcat(cmd, "\" ");
 	}
