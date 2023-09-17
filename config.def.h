@@ -107,6 +107,7 @@ static Key nkeys[] = {
 	{ {.key = TB_KEY_CTRL_R},      refresh,      {0}             },
 	{ {.ch = '\\'},                bkmrk,        {.v = root}     },
 	{ {.ch = '.'},                 toggle_df,    {0}             },
+	{ {.ch = ','},		       toggle_pug,   {0}	     },
 };
 
 /* change keys */
@@ -145,6 +146,8 @@ static const size_t ckeyslen = LEN(ckeys);
 static const mode_t ndir_perm = S_IRWXU;
 static const mode_t nf_perm   = S_IRUSR | S_IWUSR;
 
+/* permissions user:group */
+static int show_perusgr = 0;
 /* dotfiles */
 static int show_dotfiles = 0;
 

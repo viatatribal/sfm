@@ -154,6 +154,7 @@ static int read_events(void);
 static void rmwatch(Pane *);
 static void fsev_shdn(void);
 static void toggle_df(const Arg *arg);
+static void toggle_pug(const Arg *arg);
 static void start_filter(const Arg *arg);
 static void start_vmode(const Arg *arg);
 static void exit_vmode(const Arg *arg);
@@ -293,10 +294,6 @@ print_info(Pane *pane, char *dirsize)
 
 	dt = ecalloc(MAX_DTF, sizeof(char));
 
-	prm = get_fperm(CURSOR(pane).mode);
-	ur = get_fusr(CURSOR(pane).user);
-	gr = get_fgrp(CURSOR(pane).group);
-
 	if (get_fdt(dt, CURSOR(pane).dt) < 0)
 		*dt = '\0';
 
@@ -311,12 +308,22 @@ print_info(Pane *pane, char *dirsize)
 		}
 	}
 
-	print_status(cstatus, "%02d/%02d %s %s:%s %s %s %s", pane->hdir,
-		pane->dirc, prm, ur, gr, basename(CURSOR(pane).name), dt, sz);
+	if (show_perusgr) {
+		prm = get_fperm(CURSOR(pane).mode);
+		ur = get_fusr(CURSOR(pane).user);
+		gr = get_fgrp(CURSOR(pane).group);
 
-	free(prm);
-	free(ur);
-	free(gr);
+		print_status(cstatus, "%02d/%02d %s %s:%s %s %s %s", pane->hdir,
+			pane->dirc, prm, ur, gr, basename(CURSOR(pane).name), dt, sz);
+
+		free(prm);
+		free(ur);
+		free(gr);
+	} else {
+		print_status(cstatus, "%02d/%02d %s %s %s", pane->hdir,
+			pane->dirc, basename(CURSOR(pane).name), dt, sz);
+	}
+
 	free(dt);
 	free(sz);
 }
@@ -1286,6 +1293,15 @@ static void
 toggle_df(const Arg *arg)
 {
 	show_dotfiles = !show_dotfiles;
+	PERROR(listdir(&panes[Left]));
+	PERROR(listdir(&panes[Right]));
+	tb_present();
+}
+
+static void
+toggle_pug(const Arg *arg)
+{
+	show_perusgr = !show_perusgr;
 	PERROR(listdir(&panes[Left]));
 	PERROR(listdir(&panes[Right]));
 	tb_present();
