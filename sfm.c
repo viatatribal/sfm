@@ -119,7 +119,7 @@ static char *get_icon(Pane *, size_t, Cpair, mode_t);
 static void clear(int, int, int, uint16_t);
 static void clear_status(void);
 static void clear_pane(Pane *);
-static void directory_preview();
+static void dir_preview();
 static void add_hi(Pane *, size_t);
 static void rm_hi(Pane *, size_t);
 static int check_dir(char *);
@@ -199,7 +199,6 @@ static pthread_t fsev_thread;
 static Pane panes[2];
 static Pane *cpane = &panes[0];
 static Pane *preview = &panes[1];
-static int pane_idx;
 static char *editor[2];
 static char fed[] = "vi";
 static char *shell[2];
@@ -472,7 +471,7 @@ clear_pane(Pane *pane)
 
 
 static void
-directory_preview()
+dir_preview()
 {
 	int is_directory = (panes[Left].direntr[panes[Left].hdir-1].mode & S_IFMT)
 			    == S_IFDIR;
@@ -920,7 +919,7 @@ mv_ver(const Arg *arg)
 	rm_hi(cpane, cpane->hdir - 1);
 	cpane->hdir = cpane->hdir - arg->i;
 	add_hi(cpane, cpane->hdir - 1);
-	directory_preview();
+	dir_preview();
 	listdir(preview);
 	refresh_pane(preview);
 	print_info(cpane, NULL);
@@ -942,7 +941,7 @@ mvbk(const Arg *arg)
 	cpane->firstrow = cpane->parent_firstrow;
 	cpane->hdir = cpane->parent_row;
 	PERROR(listdir(cpane) < 0);
-	directory_preview();
+	dir_preview();
 	listdir(preview);
 	refresh_pane(preview);
 	cpane->parent_firstrow = 0;
@@ -966,7 +965,7 @@ mvbtm(const Arg *arg)
 		add_hi(cpane, cpane->hdir - 1);
 	}
 	print_info(cpane, NULL);
-	directory_preview();
+	dir_preview();
 	listdir(preview);
 	refresh_pane(preview);
 }
@@ -986,7 +985,7 @@ mvfwd(const Arg *arg)
 		cpane->hdir = 1;
 		cpane->firstrow = 0;
 		PERROR(listdir(cpane) < 0);
-		directory_preview();
+		dir_preview();
 		listdir(preview);
 		break;
 	case 1: /* not a directory open file */
@@ -1020,7 +1019,7 @@ mvtop(const Arg *arg)
 		add_hi(cpane, cpane->hdir - 1);
 		print_info(cpane, NULL);
 	}
-	directory_preview();
+	dir_preview();
 	listdir(preview);
 	refresh_pane(preview);
 }
@@ -2063,7 +2062,7 @@ set_panes(void)
 	panes[Right].dircol = cpanelr;
 	panes[Right].firstrow = 0;
 	panes[Right].direntr = ecalloc(0, sizeof(Entry));
-	strncpy(panes[Right].dirn, home, MAX_P);
+	strncpy(panes[Right].dirn, cwd, MAX_P);
 	panes[Right].hdir = 1;
 	panes[Right].inotify_wd = -1;
 	panes[Right].parent_row = 1;
@@ -2164,8 +2163,8 @@ start(void)
 	PERROR(start_signal() < 0);
 	PERROR(fsev_init() < 0);
 	PERROR(listdir(&panes[Left]) < 0);
-	directory_preview();
-	PERROR(listdir(&panes[Right]) < 0);
+	dir_preview();
+	listdir(&panes[Right]);
 	tb_present();
 
 	pthread_create(&fsev_thread, NULL, read_th, NULL);
