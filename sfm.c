@@ -119,7 +119,7 @@ static char *get_icon(Pane *, size_t, Cpair, mode_t);
 static void clear(int, int, int, uint16_t);
 static void clear_status(void);
 static void clear_pane(Pane *);
-static void dir_preview();
+static int dir_preview();
 static void add_hi(Pane *, size_t);
 static void rm_hi(Pane *, size_t);
 static int check_dir(char *);
@@ -351,10 +351,7 @@ print_row(Pane *pane, size_t entpos, Cpair col)
 
 	char *icon = get_icon(pane, entpos, col, pane->direntr[entpos].mode);
 
-	if(strcmp(icon, "") == 0)
-		printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth, hwidth, full_str);
-	else
-		printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth+2, hwidth, full_str);
+	printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth+2, hwidth-2, full_str);
 }
 
 static char *
@@ -424,10 +421,6 @@ get_icon(Pane *pane, size_t entpos, Cpair col, mode_t mode)
 		else
 			icon = " ";
 		break;
-	default:
-		icon = "";
-		//icon = ex; /* debug */
-		break;
 	}
 	free(ex);
 	return icon;
@@ -470,7 +463,7 @@ clear_pane(Pane *pane)
 }
 
 
-static void
+static int
 dir_preview()
 {
 	int is_directory = (panes[Left].direntr[panes[Left].hdir-1].mode & S_IFMT)
@@ -478,6 +471,7 @@ dir_preview()
 	if (panes[Left].dirc > 0 && is_directory)
 		strncpy(panes[Right].dirn,
 			panes[Left].direntr[panes[Left].hdir-1].name, MAX_P);
+	return is_directory;
 }
 
 static void
@@ -919,9 +913,8 @@ mv_ver(const Arg *arg)
 	rm_hi(cpane, cpane->hdir - 1);
 	cpane->hdir = cpane->hdir - arg->i;
 	add_hi(cpane, cpane->hdir - 1);
-	dir_preview();
-	listdir(preview);
-	refresh_pane(preview);
+	if (dir_preview())
+		listdir(preview);
 	print_info(cpane, NULL);
 }
 
@@ -941,9 +934,8 @@ mvbk(const Arg *arg)
 	cpane->firstrow = cpane->parent_firstrow;
 	cpane->hdir = cpane->parent_row;
 	PERROR(listdir(cpane) < 0);
-	dir_preview();
-	listdir(preview);
-	refresh_pane(preview);
+	if (dir_preview())
+		listdir(preview);
 	cpane->parent_firstrow = 0;
 	cpane->parent_row = 1;
 }
@@ -965,9 +957,8 @@ mvbtm(const Arg *arg)
 		add_hi(cpane, cpane->hdir - 1);
 	}
 	print_info(cpane, NULL);
-	dir_preview();
-	listdir(preview);
-	refresh_pane(preview);
+	if (dir_preview())
+		listdir(preview);
 }
 
 static void
@@ -985,8 +976,8 @@ mvfwd(const Arg *arg)
 		cpane->hdir = 1;
 		cpane->firstrow = 0;
 		PERROR(listdir(cpane) < 0);
-		dir_preview();
-		listdir(preview);
+		if (dir_preview())
+			listdir(preview);
 		break;
 	case 1: /* not a directory open file */
 		tb_shutdown();
@@ -1019,9 +1010,8 @@ mvtop(const Arg *arg)
 		add_hi(cpane, cpane->hdir - 1);
 		print_info(cpane, NULL);
 	}
-	dir_preview();
-	listdir(preview);
-	refresh_pane(preview);
+	if (dir_preview())
+		listdir(preview);
 }
 
 static void
