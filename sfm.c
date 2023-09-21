@@ -960,15 +960,15 @@ mvbtm(const Arg *arg)
 		cpane->firstrow = cpane->dirc - scrheight + 1;
 		refresh_pane(cpane);
 		add_hi(cpane, cpane->hdir - 1);
-		directory_preview();
-		listdir(preview);
-		refresh_pane(preview);
 	} else {
 		rm_hi(cpane, cpane->hdir - 1);
 		cpane->hdir = cpane->dirc;
 		add_hi(cpane, cpane->hdir - 1);
 	}
 	print_info(cpane, NULL);
+	directory_preview();
+	listdir(preview);
+	refresh_pane(preview);
 }
 
 static void
@@ -1013,8 +1013,6 @@ mvtop(const Arg *arg)
 		cpane->hdir = 1;
 		cpane->firstrow = 0;
 		refresh_pane(cpane);
-		directory_preview();
-		refresh_pane(preview);
 		add_hi(cpane, cpane->hdir - 1);
 	} else {
 		rm_hi(cpane, cpane->hdir - 1);
@@ -1022,6 +1020,9 @@ mvtop(const Arg *arg)
 		add_hi(cpane, cpane->hdir - 1);
 		print_info(cpane, NULL);
 	}
+	directory_preview();
+	listdir(preview);
+	refresh_pane(preview);
 }
 
 static void
