@@ -119,6 +119,7 @@ static char *get_icon(Pane *, size_t, Cpair, mode_t);
 static void clear(int, int, int, uint16_t);
 static void clear_status(void);
 static void clear_pane(Pane *);
+static void directory_preview();
 static void add_hi(Pane *, size_t);
 static void rm_hi(Pane *, size_t);
 static int check_dir(char *);
@@ -143,7 +144,6 @@ static void mvbtm(const Arg *arg);
 static void mvfwd(const Arg *arg);
 static void mvtop(const Arg *arg);
 static void bkmrk(const Arg *arg);
-static void cppane(const Arg *arg);
 static int get_usrinput(char *, size_t, const char *, ...);
 static int frules(char *);
 static int spawn(const void *, size_t, const void *, size_t, char *, int);
@@ -179,7 +179,6 @@ static void chngo(const Arg *arg);
 static void chngm(const Arg *arg);
 static void chngf(const Arg *arg);
 static void dupl(const Arg *arg);
-static void switch_pane(const Arg *arg);
 static void quit(const Arg *arg);
 static void grabkeys(struct tb_event *, Key *, size_t);
 static void *read_th(void *arg);
@@ -198,7 +197,8 @@ static void start(void);
 /* global variables */
 static pthread_t fsev_thread;
 static Pane panes[2];
-static Pane *cpane;
+static Pane *cpane = &panes[0];
+static Pane *preview = &panes[1];
 static int pane_idx;
 static char *editor[2];
 static char fed[] = "vi";
@@ -314,7 +314,8 @@ print_info(Pane *pane, char *dirsize)
 		gr = get_fgrp(CURSOR(pane).group);
 
 		print_status(cstatus, "%02d/%02d %s %s:%s %s %s %s", pane->hdir,
-			pane->dirc, prm, ur, gr, basename(CURSOR(pane).name), dt, sz);
+			pane->dirc, prm, ur, gr, basename(CURSOR(pane).name),
+			dt, sz);
 
 		free(prm);
 		free(ur);
@@ -467,6 +468,17 @@ clear_pane(Pane *pane)
 	for (y = pane->x_srt; y < pane->x_end; ++y) {
 		tb_change_cell(y, 0, u_hl, cframe.fg, cframe.bg);
 	}
+}
+
+
+static void
+directory_preview()
+{
+	int is_directory = (panes[Left].direntr[panes[Left].hdir-1].mode & S_IFMT)
+			    == S_IFDIR;
+	if (panes[Left].dirc > 0 && is_directory)
+		strncpy(panes[Right].dirn,
+			panes[Left].direntr[panes[Left].hdir-1].name, MAX_P);
 }
 
 static void
@@ -908,6 +920,9 @@ mv_ver(const Arg *arg)
 	rm_hi(cpane, cpane->hdir - 1);
 	cpane->hdir = cpane->hdir - arg->i;
 	add_hi(cpane, cpane->hdir - 1);
+	directory_preview();
+	listdir(preview);
+	refresh_pane(preview);
 	print_info(cpane, NULL);
 }
 
@@ -927,6 +942,9 @@ mvbk(const Arg *arg)
 	cpane->firstrow = cpane->parent_firstrow;
 	cpane->hdir = cpane->parent_row;
 	PERROR(listdir(cpane) < 0);
+	directory_preview();
+	listdir(preview);
+	refresh_pane(preview);
 	cpane->parent_firstrow = 0;
 	cpane->parent_row = 1;
 }
@@ -942,6 +960,9 @@ mvbtm(const Arg *arg)
 		cpane->firstrow = cpane->dirc - scrheight + 1;
 		refresh_pane(cpane);
 		add_hi(cpane, cpane->hdir - 1);
+		directory_preview();
+		listdir(preview);
+		refresh_pane(preview);
 	} else {
 		rm_hi(cpane, cpane->hdir - 1);
 		cpane->hdir = cpane->dirc;
@@ -965,6 +986,8 @@ mvfwd(const Arg *arg)
 		cpane->hdir = 1;
 		cpane->firstrow = 0;
 		PERROR(listdir(cpane) < 0);
+		directory_preview();
+		listdir(preview);
 		break;
 	case 1: /* not a directory open file */
 		tb_shutdown();
@@ -990,6 +1013,8 @@ mvtop(const Arg *arg)
 		cpane->hdir = 1;
 		cpane->firstrow = 0;
 		refresh_pane(cpane);
+		directory_preview();
+		refresh_pane(preview);
 		add_hi(cpane, cpane->hdir - 1);
 	} else {
 		rm_hi(cpane, cpane->hdir - 1);
@@ -1012,20 +1037,6 @@ bkmrk(const Arg *arg)
 	cpane->parent_row = 1;
 	cpane->hdir = 1;
 	PERROR(listdir(cpane) < 0);
-}
-
-static void
-cppane(const Arg *arg)
-{
-	(void) arg;
-	int other_idx;
-
-	other_idx = pane_idx ^ 1;
-	strncpy(panes[other_idx].dirn, panes[pane_idx].dirn, MAX_P);
-	panes[other_idx].hdir = panes[pane_idx].hdir;
-	panes[other_idx].firstrow = panes[pane_idx].firstrow;
-	panes[other_idx].parent_row = panes[pane_idx].parent_row;
-	PERROR(listdir(&panes[other_idx]) < 0);
 }
 
 static int
@@ -1767,20 +1778,6 @@ seldragon(const Arg *arg)
 }
 
 static void
-switch_pane(const Arg *arg)
-{
-	if (cpane->dirc > 0)
-		rm_hi(cpane, cpane->hdir - 1);
-	cpane = &panes[pane_idx ^= 1];
-	if (cpane->dirc > 0) {
-		add_hi(cpane, cpane->hdir - 1);
-		print_info(cpane, NULL);
-	} else {
-		clear_status();
-	}
-}
-
-static void
 quit(const Arg *arg)
 {
 	if (cont_vmode == -1) { /* check if selection was allocated */
@@ -2048,9 +2045,6 @@ set_panes(void)
 	if ((getcwd(cwd, sizeof(cwd)) == NULL))
 		strncpy(cwd, home, MAX_P);
 
-	pane_idx = Left; /* cursor pane */
-	cpane = &panes[pane_idx];
-
 	panes[Left].pane_id = 0;
 	panes[Left].x_srt = 2;
 	panes[Left].x_end = (twidth / 2) - 1;
@@ -2169,6 +2163,7 @@ start(void)
 	PERROR(start_signal() < 0);
 	PERROR(fsev_init() < 0);
 	PERROR(listdir(&panes[Left]) < 0);
+	directory_preview();
 	PERROR(listdir(&panes[Right]) < 0);
 	tb_present();
 
