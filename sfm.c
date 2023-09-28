@@ -351,10 +351,7 @@ print_row(Pane *pane, size_t entpos, Cpair col)
 
 	char *icon = get_icon(pane, entpos, col, pane->direntr[entpos].mode);
 
-	if(strcmp(icon, "") == 0)
-		printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth, hwidth, full_str);
-	else
-		printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth+2, hwidth, full_str);
+	printf_tb(x, y, col, "%s%*.*s", icon, ~hwidth+2, hwidth-2, full_str);
 }
 
 static char *
